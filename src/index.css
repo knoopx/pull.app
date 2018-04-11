@@ -1,0 +1,14 @@
+@tailwind preflight;
+@tailwind utilities;
+
+a {
+  @apply .text-indigo .no-underline;
+}
+
+.embed * {
+  @apply .align-middle;
+}
+
+.card {
+  @apply .flex .flex-auto .flex-col .m-2 .rounded .border .shadow .overflow-hidden .bg-white;
+}

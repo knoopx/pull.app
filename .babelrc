@@ -1,0 +1,19 @@
+{
+  "sourceMaps": "inline",
+  "presets": ["react"],
+  "plugins": [
+    "transform-export-extensions",
+    "transform-decorators-legacy",
+    "autobind-class-methods",
+    "transform-class-properties",
+    "syntax-trailing-function-commas",
+    "transform-object-rest-spread",
+    ["transform-es2015-classes", { "loose": true }],
+    "jsx-classnames"
+  ],
+  "env": {
+    "development": {
+      "plugins": ["react-hot-loader/babel"]
+    }
+  }
+}

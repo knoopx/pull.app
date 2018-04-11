@@ -1,0 +1,128 @@
+[
+  {
+    "key": "bdacbf5a-4ec4-4bc5-b75f-19a12426add5",
+    "name": "Razzmatazz",
+    "href": "https://www.salarazzmatazz.com/conciertos",
+    "selector": ".pad-section-to-0",
+    "fields": [
+      {
+        "name": "Image",
+        "selector": "img@data-src",
+        "type": "image",
+        "width": "",
+        "height": ""
+      },
+      {
+        "name": "Event",
+        "selector": ".place-event-agenda-concert p:last-child@innerHTML",
+        "type": "html",
+        "allowedTags": ["a"]
+      },
+      {
+        "name": "Place",
+        "selector": ".place-event-agenda-concert p:first-child",
+        "type": "text"
+      },
+      {
+        "name": "Price",
+        "selector": ".more-info div:last-child",
+        "type": "text"
+      }
+    ],
+    "keyField": "Event",
+    "sortField": "",
+    "sortDirection": null,
+    "viewMode": "grid",
+    "position": 0,
+    "format": "text/html",
+    "filter": ""
+  },
+  {
+    "key": "78e88a0f-3271-4016-9a01-f8eb84a04fca",
+    "name": "HackerNews",
+    "href": "https://news.ycombinator.com/",
+    "selector": ".itemlist .athing",
+    "fields": [
+      {
+        "name": "Rank",
+        "selector": ".rank",
+        "type": "number",
+        "format": "0[.]00"
+      },
+      {
+        "name": "Title",
+        "selector": ".storylink@outerHTML",
+        "type": "html",
+        "allowedTags": ["i", "em", "strong", "a", "img"]
+      }
+    ],
+    "keyField": "Rank",
+    "sortField": "Rank",
+    "sortDirection": null,
+    "viewMode": "table",
+    "position": 2,
+    "format": "text/html",
+    "filter": ""
+  },
+  {
+    "key": "37af7ae4-d703-4874-8c62-07a9252a5940",
+    "name": "CoinMarketCap",
+    "href": "https://coinmarketcap.com/",
+    "selector": "#currencies tr",
+    "fields": [
+      {
+        "name": "Currency",
+        "selector": ".currency-name-container@outerHTML",
+        "type": "html",
+        "allowedTags": ["i", "em", "strong", "a", "img"]
+      },
+      {
+        "name": "Price",
+        "selector": ".price@data-usd",
+        "type": "number",
+        "format": "$0[.]0000 a"
+      },
+      {
+        "name": "History",
+        "selector": "img.sparkline@src",
+        "type": "image",
+        "width": "100%",
+        "height": "auto"
+      }
+    ],
+    "keyField": "Currency",
+    "sortField": "Price",
+    "sortDirection": "asc",
+    "viewMode": "grid",
+    "position": 3,
+    "format": "text/html",
+    "filter": ""
+  },
+  {
+    "key": "da1237a3-efeb-435a-9da3-7775abd9ddd5",
+    "name": "GitHub Trending",
+    "href": "https://github.com/trending",
+    "selector": "ol.repo-list li",
+    "fields": [
+      {
+        "name": "Name",
+        "selector": "h3@innerHTML",
+        "type": "html",
+        "allowedTags": ["a"]
+      },
+      { "name": "Description", "selector": "p", "type": "text" },
+      {
+        "name": "Language",
+        "selector": "[itemprop=\"programmingLanguage\"]",
+        "type": "text"
+      }
+    ],
+    "keyField": "Name",
+    "sortField": "",
+    "sortDirection": null,
+    "viewMode": "table",
+    "position": 4,
+    "format": "text/html",
+    "filter": ""
+  }
+]
