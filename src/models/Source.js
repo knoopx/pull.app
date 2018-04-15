@@ -1,13 +1,38 @@
 import sha1 from 'sha1'
-import { autorun, values } from 'mobx'
+import { autorun } from 'mobx'
 import { now } from 'mobx-utils'
-import { orderBy } from 'lodash'
-import { types as t, flow, clone } from 'mobx-state-tree'
-import fetch from '../support/fetch'
+import { flatMap, orderBy } from 'lodash'
+import { types as t, flow, clone, getParent } from 'mobx-state-tree'
 import scrape from '../support/scrape'
 
-import Item from './Item'
 import Field from './Field'
+
+const Response = t
+  .model('Response', {
+    body: t.string,
+    createdAt: t.optional(t.Date, () => Date.now()),
+  })
+  .views(self => ({
+    get source() {
+      return getParent(self, 2)
+    },
+    get doc() {
+      const parser = new DOMParser()
+      return parser.parseFromString(self.body, self.source.format)
+    },
+    get items() {
+      return scrape(
+        [self.source.selector],
+        self.source.fields.reduce(
+          (result, field) => ({
+            ...result,
+            [field.name]: field.selector,
+          }),
+          {},
+        ),
+      )(self.doc)
+    },
+  }))
 
 const disposables = []
 
@@ -22,12 +47,12 @@ export default t
     sortField: t.optional(t.string, ''),
     sortDirection: t.maybe(t.enumeration(['asc', 'desc'])),
     viewMode: t.optional(t.enumeration(['grid', 'table']), 'table'),
-    items: t.optional(t.map(Item), {}),
     lastUpdateAt: t.maybe(t.Date),
     lastClearedAt: t.maybe(t.Date),
     position: t.number,
     format: t.optional(t.enumeration(['text/html', 'text/xml']), 'text/html'),
     filter: t.optional(t.string, ''),
+    responses: t.optional(t.array(Response), []),
   })
   .volatile(self => ({
     error: null,
@@ -44,9 +69,17 @@ export default t
       )
     },
 
+    get items() {
+      return flatMap(self.responses, response =>
+        response.items.map(item => ({
+          data: item,
+          isNew: response.createdAt > self.lastClearedAt,
+        })))
+    },
+
     get filteredItems() {
       const regex = new RegExp(self.filter, 'i')
-      return values(self.items).filter((item) => {
+      return self.items.filter((item) => {
         if (self.filter.length > 0) {
           return Object.values(item.data).some(x => regex.test(x))
         }
@@ -66,7 +99,7 @@ export default t
     },
 
     get newItemsCount() {
-      return values(self.items).filter(item => item.isNew).length
+      return self.items.filter(item => item.isNew).length
     },
   }))
   .actions(self => ({
@@ -103,22 +136,6 @@ export default t
       self.fields[to] = fromField
       self.fields[from] = toField
     },
-    addItem(doc) {
-      const data = scrape(self.schema)(doc)
-
-      if (data[self.keyField] && data[self.keyField].length) {
-        const key = sha1(data[self.keyField])
-        const html = doc.outerHTML
-        if (self.items.has(key)) {
-          Object.assign(self.items.get(key), {
-            html,
-            updatedAt: Date.now(),
-          })
-        } else {
-          self.items.put({ key, html, createdAt: Date.now() })
-        }
-      }
-    },
     setFilter(value) {
       self.filter = value
     },
@@ -134,10 +151,12 @@ export default t
       self.error = null
 
       try {
-        const doc = yield fetch(self.href, self.format)
-        const items = doc.querySelectorAll(self.selector)
-        items.forEach(self.addItem)
+        // const doc = yield fetch(self.href, self.format)
+        const response = yield fetch(self.href)
+        const body = yield response.text()
+        self.responses.push({ body })
       } catch (err) {
+        console.log(err)
         self.error = err
       } finally {
         self.lastUpdateAt = Date.now()

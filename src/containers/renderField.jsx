@@ -1,8 +1,12 @@
 import numeral from 'numeral'
 import sanitizeHtml from 'sanitize-html'
 import React from 'react'
+import Inspector from 'react-inspector'
 
 export default function renderField(field, item) {
+  // return <Inspector data={item.data[field.name]} />
+  // console.log(item.data[field.name])
+
   if (item.data[field.name] instanceof Error) {
     return (
       <span className="p-1 bg-red-lightest rounded text-xs text-red-light mr-4">

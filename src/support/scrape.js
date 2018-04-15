@@ -1,3 +1,5 @@
+import cssSelect from 'css-select'
+import adapter from './adapter'
 import { flow, isString, isFunction, isObject, isArray } from 'lodash'
 
 // TODO: https://www.npmjs.com/package/inline-elements
@@ -17,7 +19,7 @@ function getProp(propName) {
       if (el[propName]) {
         return el[propName]
       }
-      if (el.attributes[propName]) {
+      if (el.attributes && el.attributes[propName]) {
         return el.attributes[propName].value
       }
     }
@@ -69,7 +71,7 @@ function shape(schema) {
 function queryAll(query, schema) {
   return (doc) => {
     const { selector, propName, filters } = parseQuery(query)
-    const results = Array.from(doc.querySelectorAll(selector))
+    const results = cssSelect(selector, doc, { adapter })
     if (isFunction(schema)) {
       if (query.includes('@')) {
         return results.map(flow(getProp(propName), applyFilters(filters), schema))
@@ -93,7 +95,7 @@ function queryOne(query, fn = val => val) {
       const { selector, propName, filters } = parseQuery(query)
       if (selector && selector.length) {
         try {
-          const value = doc.querySelector(selector)
+          const value = cssSelect(selector, doc, { adapter })[0]
           return flow(getProp(propName), applyFilters(filters), fn)(value)
         } catch (err) {
           return err
