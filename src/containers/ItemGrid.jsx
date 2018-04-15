@@ -13,15 +13,16 @@ export default class ItemGrid extends React.Component {
         {source.sortedItems.map(item => (
           <div key={item.key} className="flex w-1/4">
             <div className="card p-4">
-              {source.fields.map(field => (
+              {Object.keys(item.data).map(key => (
                 <div
-                  key={field.name}
+                  key={key}
                   className={[
                     'flex flex-wrap items-center mb-2 ',
                     { 'font-bold': item.isNew },
                   ]}
                 >
-                  {renderField(field, item)}
+                  {/* {renderField(field, item)} */}
+                  {item.data[key]}
                 </div>
               ))}
             </div>

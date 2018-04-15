@@ -3,9 +3,7 @@ import { autorun } from 'mobx'
 import { now } from 'mobx-utils'
 import { flatMap, orderBy } from 'lodash'
 import { types as t, flow, clone, getParent } from 'mobx-state-tree'
-import scrape from '../support/scrape'
-
-import Field from './Field'
+import alasql from 'alasql'
 
 const Response = t
   .model('Response', {
@@ -21,16 +19,12 @@ const Response = t
       return parser.parseFromString(self.body, self.source.format)
     },
     get items() {
-      return scrape(
-        [self.source.selector],
-        self.source.fields.reduce(
-          (result, field) => ({
-            ...result,
-            [field.name]: field.selector,
-          }),
-          {},
-        ),
-      )(self.doc)
+      try {
+        return alasql(self.source.selector, [[].slice.call(self.doc.all)])
+      } catch (err) {
+        console.error(err)
+        return []
+      }
     },
   }))
 
@@ -42,7 +36,6 @@ export default t
     name: t.string,
     href: t.string,
     selector: t.string,
-    fields: t.optional(t.array(Field), []),
     keyField: t.optional(t.string, ''),
     sortField: t.optional(t.string, ''),
     sortDirection: t.maybe(t.enumeration(['asc', 'desc'])),
@@ -123,18 +116,6 @@ export default t
       if (shouldRemove) {
         self.items.clear()
       }
-    },
-    addField(props) {
-      self.fields.push(props)
-    },
-    removeField(field) {
-      self.fields.remove(field)
-    },
-    swapFields(from, to) {
-      const fromField = clone(self.fields[from])
-      const toField = clone(self.fields[to])
-      self.fields[to] = fromField
-      self.fields[from] = toField
     },
     setFilter(value) {
       self.filter = value

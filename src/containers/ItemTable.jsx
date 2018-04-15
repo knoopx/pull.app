@@ -1,5 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
+import Inspector from 'react-inspector'
 
 import renderField from './renderField'
 
@@ -10,7 +11,7 @@ export default class ItemTable extends React.Component {
 
     return (
       <table className="w-full bg-white" style={{ borderCollapse: 'collapse' }}>
-        <thead>
+        {/* <thead>
           <tr>
             {source.fields.map(field => (
               <th
@@ -43,12 +44,12 @@ export default class ItemTable extends React.Component {
               </th>
             ))}
           </tr>
-        </thead>
+        </thead> */}
         <tbody>
           {source.sortedItems.map(item => (
             <tr key={item.key}>
-              {source.fields.map(field => (
-                <React.Fragment key={field.name}>
+              {Object.keys(item.data).map(key => (
+                <React.Fragment key={key}>
                   <td className="px-4 py-2 border-b">
                     <div
                       className={[
@@ -56,7 +57,9 @@ export default class ItemTable extends React.Component {
                         { 'font-bold': item.isNew },
                       ]}
                     >
-                      {renderField(field, item)}
+                      {/* <Inspector data={item.data[key]} /> */}
+                      {/* {renderField(key, item.data[key])} */}
+                      {item.data[key]}
                     </div>
                   </td>
                 </React.Fragment>
