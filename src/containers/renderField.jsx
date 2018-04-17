@@ -1,15 +1,37 @@
 import numeral from 'numeral'
 import sanitizeHtml from 'sanitize-html'
 import React from 'react'
+import Inspector from 'react-inspector'
 
-export default function renderField(field, item) {
-  const value = item.data[field.name]
+function nodeToValue(node) {
+  if (Array.isArray(node)) {
+    return node.map(nodeToValue)
+  }
+
+  if (node instanceof Element) {
+    return node.outerHTML
+  }
+
+  if (node instanceof Text) {
+    return node.nodeValue
+  }
+
+  return node
+}
+
+export default function renderField(field, item, mode) {
+  const value = nodeToValue(item.data[field.name])
+
   if (value instanceof Error) {
     return (
       <span className="p-1 bg-red-lightest rounded text-xs text-red-light mr-4">
         {value.message}
       </span>
     )
+  }
+
+  if (mode === 'edit') {
+    return <Inspector data={item.data[field.name]} />
   }
 
   switch (field.type) {

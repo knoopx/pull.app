@@ -72,7 +72,7 @@ export default t
     },
     fetchSources() {
       self.sortedSources.forEach((source) => {
-        source.fetchItems()
+        source.fetch()
       })
     },
     exportSources() {

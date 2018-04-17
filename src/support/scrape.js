@@ -17,7 +17,7 @@ function getProp(propName) {
       if (el[propName]) {
         return el[propName]
       }
-      if (el.attributes[propName]) {
+      if (el.attributes && el.attributes[propName]) {
         return el.attributes[propName].value
       }
     }

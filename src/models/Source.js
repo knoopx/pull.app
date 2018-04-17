@@ -67,6 +67,10 @@ export default t
     get newItemsCount() {
       return values(self.items).filter(item => item.isNew).length
     },
+
+    get validFields() {
+      return self.fields.filter(f => f.name)
+    },
   }))
   .actions(self => ({
     afterCreate() {
@@ -77,6 +81,12 @@ export default t
               self.fetch()
             }
           }
+        }
+      }))
+
+      disposables.push(autorun(() => {
+        if (self.response && self.mode !== 'edit') {
+          self.response.items.forEach(self.addItem)
         }
       }))
     },
@@ -114,11 +124,18 @@ export default t
     setViewMode(name) {
       self.viewMode = name
     },
+    addItem(item) {
+      self.items.put(item)
+    },
     fetch: flow(function* () {
-      const res = yield fetch(self.href)
-      const body = yield res.text()
-      self.response = {
-        body,
+      try {
+        const res = yield fetch(self.href)
+        const body = yield res.text()
+        self.response = {
+          body,
+        }
+      } finally {
+        self.lastUpdateAt = Date.now()
       }
     }),
   }))

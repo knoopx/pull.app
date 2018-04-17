@@ -1,22 +1,30 @@
 import React from 'react'
-import { observer } from 'mobx-react'
-
+import { inject, observer } from 'mobx-react'
 import renderField from './renderField'
 
+@inject('store')
 @observer
 export default class ItemTable extends React.Component {
   render() {
-    const { source } = this.props
-
+    const { source, items, store } = this.props
+    if (items instanceof Error) {
+      return (
+        <div className="flex flex-auto items-center justify-center">
+          <span className="p-1 bg-red-lightest rounded text-xs text-red-light mr-4">
+            {items.message}
+          </span>
+        </div>
+      )
+    }
     return (
       <table className="w-full bg-white" style={{ borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            {source.fields.map(field => (
+            {source.validFields.map(field => (
               <th
                 key={field.name}
                 className={[
-                  'px-4 py-2 border-b-2 font-medium text-left sticky pin-t bg-white cursor-pointer',
+                  'px-4 py-2 border-b-2 font-medium text-left pin-t bg-white cursor-pointer',
                   {
                     'font-bold': source.sortField === field.name,
                   },
@@ -45,9 +53,9 @@ export default class ItemTable extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {source.sortedItems.map(item => (
+          {items.map(item => (
             <tr key={item.key}>
-              {source.fields.map(field => (
+              {source.validFields.map(field => (
                 <React.Fragment key={field.name}>
                   <td className="px-4 py-2 border-b">
                     <div
@@ -56,7 +64,7 @@ export default class ItemTable extends React.Component {
                         { 'font-bold': item.isNew },
                       ]}
                     >
-                      {renderField(field, item)}
+                      {renderField(field, item, store.mode)}
                     </div>
                   </td>
                 </React.Fragment>

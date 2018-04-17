@@ -17,6 +17,8 @@ import EditSourceScreen from '../screens/EditSourceScreen'
 import ItemTable from './ItemTable'
 import ItemGrid from './ItemGrid'
 
+import Inspector from 'react-inspector'
+
 @inject('store')
 @observer
 class App extends React.Component {
@@ -132,7 +134,7 @@ class App extends React.Component {
                     <a
                       className="cursor-pointer text-indigo mx-1"
                       onClick={() => {
-                        activeSource.fetchItems()
+                        activeSource.fetch()
                       }}
                     >
                       <IconRefresh size="1rem" />
@@ -151,12 +153,23 @@ class App extends React.Component {
               </div>
               <div
                 key={activeSource.key}
-                className="flex-auto overflow-auto bg-grey-lightest"
+                className="flex flex-auto overflow-auto bg-grey-lightest"
               >
-                {activeSource.viewMode === 'grid' ? (
-                  <ItemGrid source={activeSource} />
+                {this.props.store.mode === 'edit' ? (
+                  <ItemTable
+                    source={activeSource}
+                    items={activeSource.response.items}
+                  />
+                ) : activeSource.viewMode === 'grid' ? (
+                  <ItemGrid
+                    source={activeSource}
+                    items={activeSource.sortedItems}
+                  />
                 ) : (
-                  <ItemTable source={activeSource} />
+                  <ItemTable
+                    source={activeSource}
+                    items={activeSource.sortedItems}
+                  />
                 )}
               </div>
             </React.Fragment>

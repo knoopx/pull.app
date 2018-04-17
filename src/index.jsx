@@ -6,6 +6,10 @@ import { Provider } from 'mobx-react'
 import { debounce } from 'lodash'
 import { onSnapshot } from 'mobx-state-tree'
 
+import { install } from 'wicked-good-xpath'
+
+install(global, true)
+
 const store = Store.create(localStorage.store ? JSON.parse(localStorage.store) : {})
 
 render(
