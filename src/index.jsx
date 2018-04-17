@@ -4,16 +4,13 @@ import App from './containers/App'
 import Store from './stores'
 import { Provider } from 'mobx-react'
 import { debounce } from 'lodash'
-import { onSnapshot, getSnapshot, applySnapshot } from 'mobx-state-tree'
-import { HashRouter } from 'react-router-dom'
+import { onSnapshot } from 'mobx-state-tree'
 
 const store = Store.create(localStorage.store ? JSON.parse(localStorage.store) : {})
 
 render(
   <Provider store={store}>
-    <HashRouter>
-      <App />
-    </HashRouter>
+    <App />
   </Provider>,
   document.getElementById('root'),
 )

@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router'
 import { inject, observer } from 'mobx-react'
 import { Input, Select, Link, Button, OutlineButton } from '../components'
 
@@ -9,7 +8,6 @@ import IconTrash from 'react-icons/lib/md/highlight-remove'
 import FieldList from './FieldList'
 
 @inject('store')
-@withRouter
 @observer
 export default class SourceForm extends React.Component {
   onChange(e) {
@@ -17,10 +15,10 @@ export default class SourceForm extends React.Component {
   }
 
   onRemove() {
-    const { source, store, history } = this.props
+    const { source, store } = this.props
     store.setActiveSource(null)
     store.removeSource(source)
-    history.push('/')
+    store.setMode('view')
   }
 
   render() {

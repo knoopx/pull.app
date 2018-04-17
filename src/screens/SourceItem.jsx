@@ -1,6 +1,5 @@
 import React from 'react'
 import { inject, observer } from 'mobx-react'
-import { Link } from 'react-router-dom'
 import IconClear from 'react-icons/lib/md/clear-all'
 import IconEdit from 'react-icons/lib/md/edit'
 import IconError from 'react-icons/lib/md/error'

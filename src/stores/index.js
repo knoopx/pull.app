@@ -1,3 +1,4 @@
+import uuid from 'uuid/v4'
 import { values, autorun } from 'mobx'
 import { orderBy } from 'lodash'
 import { types as t, getSnapshot } from 'mobx-state-tree'
@@ -8,6 +9,7 @@ import Source from '../models/Source'
 const disposables = []
 export default t
   .model('Store', {
+    mode: t.optional(t.enumeration(['view', 'edit']), 'view'),
     activeSource: t.maybe(t.reference(Source)),
     sources: t.optional(t.map(Source), {}),
   })
@@ -31,8 +33,29 @@ export default t
     afterDestroy() {
       disposables.forEach(dispose => dispose())
     },
+    setMode(value) {
+      self.mode = value
+    },
     setActiveSource(source) {
       self.activeSource = source
+    },
+    newSource() {
+      const source = Source.create({
+        key: uuid(),
+        name: '',
+        href: '',
+        selector: '',
+        fields: [
+          {
+            name: '',
+            selector: '',
+            type: 'text',
+          },
+        ],
+        position: self.sources.size,
+      })
+      self.addSource(source)
+      return source
     },
     addSource(source) {
       self.sources.put(source)

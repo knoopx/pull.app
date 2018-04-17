@@ -11,14 +11,14 @@ export default class EditSourceScreen extends React.Component {
   @observable source
 
   componentWillMount() {
-    const { store, match } = this.props
-    this.source = store.sources.get(match.params.id)
-    this.snapshot = getSnapshot(this.source)
+    const { store } = this.props
+    this.snapshot = getSnapshot(store.activeSource)
   }
   render() {
+    const { store } = this.props
     return (
       <SourceForm
-        source={this.source}
+        source={store.activeSource}
         onSubmit={this.onSubmit}
         onCancel={this.onCancel}
       />
@@ -30,16 +30,15 @@ export default class EditSourceScreen extends React.Component {
   }
 
   onCancel(e) {
-    const { history } = this.props
+    const { store } = this.props
     e.preventDefault()
-    applySnapshot(this.source, this.snapshot)
-    history.push('/sources/list')
+    applySnapshot(store.activeSource, this.snapshot)
+    store.setMode('view')
   }
 
   onSubmit(e) {
-    const { store, history } = this.props
+    const { store } = this.props
     e.preventDefault()
-    // store.addSource({ ...this.source, items: {} })
-    history.push('/sources/list')
+    store.setMode('view')
   }
 }

@@ -97,8 +97,6 @@
     "react-hot-loader": "^4.0.1",
     "react-icons": "^2.2.7",
     "react-inspector": "^2.3.0",
-    "react-router": "^4.2.0",
-    "react-router-dom": "^4.2.2",
     "sanitize-html": "^1.18.2",
     "sha1": "^1.1.1",
     "source-map-support": "^0.5.4",
