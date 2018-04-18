@@ -44,6 +44,7 @@ export default class Field extends React.Component {
           <Select name="type" value={field.type} onChange={this.onChange}>
             <option value="text">Text</option>
             <option value="number">Number</option>
+            <option value="date">Date</option>
             <option value="image">Image</option>
             <option value="html">HTML</option>
           </Select>

@@ -11,7 +11,7 @@ export default class ItemGrid extends React.Component {
     return (
       <div className="flex flex-auto flex-wrap p-2">
         {source.sortedItems.map(item => (
-          <div key={item.key} className="flex w-1/4">
+          <div key={item.key} className="w-1/4">
             <div className="card p-4">
               {source.validFields.map(field => (
                 <div

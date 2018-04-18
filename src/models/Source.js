@@ -1,7 +1,8 @@
+import sha1 from 'sha1'
 import { autorun, values } from 'mobx'
 import { now } from 'mobx-utils'
 import { orderBy } from 'lodash'
-import { types as t, flow, clone } from 'mobx-state-tree'
+import { types as t, flow, clone, getParent } from 'mobx-state-tree'
 
 import Item from './Item'
 import Field from './Field'
@@ -33,6 +34,9 @@ export default t
     isLoading: false,
   }))
   .views(self => ({
+    get store() {
+      return getParent(self, 2)
+    },
     get schema() {
       return self.fields.reduce(
         (res, field) => ({
@@ -44,8 +48,14 @@ export default t
     },
 
     get filteredItems() {
+      const items =
+        self.store.mode === 'edit' ? self.response.items : values(self.items)
+
+      if (items instanceof Error) {
+        return items
+      }
       const regex = new RegExp(self.filter, 'i')
-      return values(self.items).filter((item) => {
+      return items.filter((item) => {
         if (self.filter.length > 0) {
           return Object.values(item.data).some(x => regex.test(x))
         }
@@ -85,8 +95,12 @@ export default t
       }))
 
       disposables.push(autorun(() => {
-        if (self.response && self.mode !== 'edit') {
-          self.response.items.forEach(self.addItem)
+        if (self.response && self.store.mode === 'view') {
+          if (self.response.items instanceof Error) {
+            console.error(self.response.items.message)
+          } else {
+            self.response.items.forEach(self.addItem)
+          }
         }
       }))
     },
@@ -124,8 +138,26 @@ export default t
     setViewMode(name) {
       self.viewMode = name
     },
-    addItem(item) {
-      self.items.put(item)
+    addItem(props) {
+      const keyValue = props.data[self.keyField]
+      if (keyValue) {
+        const key = sha1(keyValue)
+        if (self.items.has(key)) {
+          const item = self.items.get(key)
+          self.items.put({
+            ...item,
+            ...props,
+            key,
+            updatedAt: Date.now(),
+          })
+        } else {
+          self.items.put({
+            ...props,
+            key,
+            createdAt: Date.now(),
+          })
+        }
+      }
     },
     fetch: flow(function* () {
       try {

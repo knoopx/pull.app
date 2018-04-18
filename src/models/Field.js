@@ -8,7 +8,7 @@ export default t
     format: t.optional(t.string, '0[.]00'),
     width: t.optional(t.string, ''),
     height: t.optional(t.string, ''),
-    type: t.enumeration(['text', 'number', 'image', 'html']),
+    type: t.enumeration(['text', 'number', 'date', 'image', 'html']),
   })
   .actions(self => ({
     update(props) {

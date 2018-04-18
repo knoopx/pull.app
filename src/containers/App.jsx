@@ -155,12 +155,7 @@ class App extends React.Component {
                 key={activeSource.key}
                 className="flex flex-auto overflow-auto bg-grey-lightest"
               >
-                {this.props.store.mode === 'edit' ? (
-                  <ItemTable
-                    source={activeSource}
-                    items={activeSource.response.items}
-                  />
-                ) : activeSource.viewMode === 'grid' ? (
+                {activeSource.viewMode === 'grid' ? (
                   <ItemGrid
                     source={activeSource}
                     items={activeSource.sortedItems}

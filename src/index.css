@@ -1,6 +1,10 @@
 @tailwind preflight;
 @tailwind utilities;
 
+* {
+  -webkit-font-smoothing: antialiased;
+}
+
 a {
   @apply .text-indigo .no-underline;
 }

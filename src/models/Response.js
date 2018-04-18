@@ -1,4 +1,4 @@
-import sha1 from 'sha1'
+import urlJoin from 'url-join'
 import { types as t, getParent } from 'mobx-state-tree'
 
 // XPathResult = {
@@ -14,6 +14,75 @@ import { types as t, getParent } from 'mobx-state-tree'
 //   FIRST_ORDERED_NODE_TYPE: 9
 // };
 
+function xpathize(expr) {
+  const types = {
+    '#': 'id',
+    '.': 'class',
+  }
+  return expr.replace(
+    /([_a-zA-Z][_a-zA-Z0-9-]*)?([.#])([_a-zA-Z][_a-zA-Z0-9-]*)/gi,
+    (_, tag, type, value) =>
+      `${tag || '*'}[contains(concat(' ', normalize-space(./@${
+        types[type]
+      }), ' '), ' ${value} ')]`,
+  )
+  // .replace(':first-child', '[first()]')
+  // .replace(':last-child', '[last()]')
+  // .replace(/:closest\(([^)]+)\)/, '/ancestor-or-self::$1')
+}
+
+function absolutize(url, baseUrl) {
+  if (
+    !url ||
+    /^(https?|file|ftps?|mailto|javascript|data:image\/[^;]{2,9};):/i.test(url)
+  ) {
+    return url
+  }
+
+  if (url.match(/^\/\//)) {
+    return `http:${url}`
+  }
+
+  return urlJoin(baseUrl, url)
+}
+
+function _rewrite(baseUrl, attrName) {
+  return (el) => {
+    if (el.attributes[attrName]) {
+      el.attributes[attrName].value = absolutize(
+        el.attributes[attrName].value,
+        baseUrl,
+      )
+    }
+  }
+}
+
+export function rewrite(doc, baseUrl) {
+  Array.from(doc.querySelectorAll('img, script,iframe')).forEach(_rewrite(baseUrl, 'src'))
+  Array.from(doc.querySelectorAll('a, link')).forEach(_rewrite(baseUrl, 'href'))
+  return doc
+}
+
+function nodeToValue(node) {
+  if (Array.isArray(node)) {
+    return nodeToValue(node[0])
+  }
+
+  if (node instanceof Element) {
+    return node.outerHTML
+  }
+
+  if (node instanceof Attr) {
+    return node.value
+  }
+
+  if (node instanceof Text) {
+    return node.nodeValue
+  }
+
+  return node
+}
+
 export default t
   .model('Response', {
     body: t.string,
@@ -24,12 +93,21 @@ export default t
       return getParent(self)
     },
     get doc() {
+      const url = new URL(self.source.href)
       const parser = new DOMParser()
-      return parser.parseFromString(self.body, self.source.format)
+      const doc = parser.parseFromString(self.body, self.source.format)
+      rewrite(doc, url.origin)
+      return doc
     },
     xpath(selector, element, type = XPathResult.ORDERED_NODE_ITERATOR_TYPE) {
       const array = []
-      const results = self.doc.evaluate(selector, element, null, type, null)
+      const results = self.doc.evaluate(
+        xpathize(selector),
+        element,
+        null,
+        type,
+        null,
+      )
 
       switch (results.resultType) {
         case XPathResult.STRING_TYPE:
@@ -59,7 +137,7 @@ export default t
           const data = self.source.validFields.reduce((res, field) => {
             let value
             try {
-              value = self.xpath(field.selector, node, XPathResult.ANY_TYPE)
+              value = nodeToValue(self.xpath(field.selector, node, XPathResult.ANY_TYPE))
             } catch (err) {
               value = err
             }
@@ -68,11 +146,10 @@ export default t
             return res
           }, {})
 
-          return { data, key: sha1(data[self.source.keyField].toString()) }
+          return { data, key: data[self.source.keyField] }
         })
       } catch (err) {
-        console.error(err)
-        return []
+        return err
       }
     },
   }))

@@ -1,26 +1,15 @@
 import numeral from 'numeral'
+import moment from 'moment'
 import sanitizeHtml from 'sanitize-html'
 import React from 'react'
 import Inspector from 'react-inspector'
 
-function nodeToValue(node) {
-  if (Array.isArray(node)) {
-    return node.map(nodeToValue)
-  }
-
-  if (node instanceof Element) {
-    return node.outerHTML
-  }
-
-  if (node instanceof Text) {
-    return node.nodeValue
-  }
-
-  return node
-}
-
 export default function renderField(field, item, mode) {
-  const value = nodeToValue(item.data[field.name])
+  const value = item.data[field.name]
+
+  if (!value) {
+    return
+  }
 
   if (value instanceof Error) {
     return (
@@ -30,11 +19,13 @@ export default function renderField(field, item, mode) {
     )
   }
 
-  if (mode === 'edit') {
-    return <Inspector data={item.data[field.name]} />
-  }
+  // if (mode === 'edit') {
+  //   return <Inspector data={value} />
+  // }
 
   switch (field.type) {
+    case 'date':
+      return moment(value).calendar()
     case 'number':
       return numeral(value).format(field.format)
     case 'image':

@@ -7,7 +7,12 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 module.exports = {
   target: 'electron-renderer',
   devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'eval',
-  entry: ['source-map-support/register', './src/index.css', './src/index.jsx'],
+  entry: [
+    'source-map-support/register',
+    'typeface-source-sans-pro',
+    './src/index.css',
+    './src/index.jsx',
+  ],
   plugins: [
     new webpack.ExternalsPlugin('commonjs', Object.keys(dependencies)),
     new ExtractTextPlugin({
@@ -41,7 +46,6 @@ module.exports = {
             'postcss-loader',
           ],
         }),
-        include: [path.resolve(__dirname, 'src')],
       },
       {
         test: /\.jsx?$/,
@@ -49,6 +53,12 @@ module.exports = {
         include: [
           path.resolve('./src'),
           path.resolve('./node_modules/react-icons'),
+        ],
+      },
+      {
+        use: 'file-loader',
+        include: [
+          path.resolve('./node_modules/typeface-source-sans-pro/files'),
         ],
       },
     ],
