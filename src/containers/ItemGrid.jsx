@@ -18,7 +18,7 @@ export default class ItemGrid extends React.Component {
                   key={field.name}
                   className={[
                     'flex flex-wrap items-center mb-2 ',
-                    { 'font-bold': item.isNew },
+                    { 'font-medium': item.isNew },
                   ]}
                 >
                   {renderField(field, item)}

@@ -1,4 +1,6 @@
 import urlJoin from 'url-join'
+import numeral from 'numeral'
+import moment from 'moment'
 import { types as t, getParent } from 'mobx-state-tree'
 
 // XPathResult = {
@@ -13,6 +15,17 @@ import { types as t, getParent } from 'mobx-state-tree'
 //   ANY_UNORDERED_NODE_TYPE: 8,
 //   FIRST_ORDERED_NODE_TYPE: 9
 // };
+
+function typecast(type, value) {
+  switch (type) {
+    case 'number':
+      return numeral(value).value()
+    case 'date':
+      return moment(value).valueOf()
+    default:
+      return value
+  }
+}
 
 function xpathize(expr) {
   const types = {
@@ -137,7 +150,10 @@ export default t
           const data = self.source.validFields.reduce((res, field) => {
             let value
             try {
-              value = nodeToValue(self.xpath(field.selector, node, XPathResult.ANY_TYPE))
+              value = typecast(
+                field.type,
+                nodeToValue(self.xpath(field.selector, node, XPathResult.ANY_TYPE)),
+              )
             } catch (err) {
               value = err
             }

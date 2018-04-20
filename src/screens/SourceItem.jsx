@@ -51,7 +51,7 @@ export default class SourceItem extends React.Component {
             {source.newItemsCount > 0 && (
               <React.Fragment>
                 <div
-                  className="flex items-center justify-center bg-indigo text-white p-2 text-xs rounded-full ml-4 leading-none"
+                  className="flex items-center justify-center bg-indigo text-white p-2 text-xs rounded-full ml-4 leading-none font-bold"
                   style={{ minWidth: '1.25rem', height: '1.25rem' }}
                 >
                   {source.newItemsCount}

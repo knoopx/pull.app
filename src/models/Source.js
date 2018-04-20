@@ -49,7 +49,9 @@ export default t
 
     get filteredItems() {
       const items =
-        self.store.mode === 'edit' ? self.response.items : values(self.items)
+        (self.store.mode === 'edit'
+          ? self.response && self.response.items
+          : values(self.items)) || []
 
       if (items instanceof Error) {
         return items
@@ -96,6 +98,7 @@ export default t
 
       disposables.push(autorun(() => {
         if (self.response && self.store.mode === 'view') {
+          console.log(`aggregating ${self.name} (${self.response.items.length})`)
           if (self.response.items instanceof Error) {
             console.error(self.response.items.message)
           } else {
@@ -157,6 +160,8 @@ export default t
             createdAt: Date.now(),
           })
         }
+      } else {
+        // console.log(`Ignoring ${JSON.stringify(props)}, no valid keys`)
       }
     },
     fetch: flow(function* () {

@@ -24,10 +24,7 @@ export default class ItemTable extends React.Component {
               <th
                 key={field.name}
                 className={[
-                  'px-4 py-2 border-b-2 font-medium text-left pin-t bg-white cursor-pointer',
-                  {
-                    'font-bold': source.sortField === field.name,
-                  },
+                  'px-4 py-2 border-b-2 font-medium text-left pin-t bg-white cursor-pointer font-bold',
                 ]}
                 onClick={(e) => {
                   if (source.sortField === field.name) {
@@ -61,7 +58,7 @@ export default class ItemTable extends React.Component {
                     <div
                       className={[
                         'flex items-center',
-                        { 'font-bold': item.isNew },
+                        { 'font-medium': item.isNew },
                       ]}
                     >
                       {renderField(field, item, store.mode)}
